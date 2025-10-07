@@ -1,12 +1,47 @@
 import  express  from "express"
+import { createServer } from "node:http"
+import { Server } from "socket.io"
+import cors  from "cors"
+import connectDB from "./config/db"
+import cookieParser from "cookie-parser"
+import { userRouter } from "./routes/user.route"
 
-
+//express server
 const app = express()
+app.use(cors())
+app.use(cookieParser())
+const server = createServer(app)
+
+
+// connectDB()
+//socket
+const io = new Server(server, {
+    cors:{
+        origin:"http://localhost:5173",
+        methods:["POST","GET"]
+    }
+})
+
+io.on("connection", (socket) => {
+    console.log(`socket connected: ${socket.id}`)
+    socket.on("chat-message", (value) => {
+        socket.broadcast.emit(value)
+        io.emit(value)
+        console.log(value)
+    })
+
+    socket.on("chat:message", (data) => {
+        console.log(data)
+    })
+})
 
 app.get("/", (req,res) => {
     res.send("hello world")
 })
 
-app.listen(3000, () => {
+//user router
+app.use("/api/v1/user", userRouter)
+
+server.listen(3000, () => {
     console.log(`server is running on http://localhost:3000`)
 })

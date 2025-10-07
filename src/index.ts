@@ -5,6 +5,7 @@ import cors  from "cors"
 import connectDB from "./config/db"
 import cookieParser from "cookie-parser"
 import { userRouter } from "./routes/user.route"
+import { roomRouter } from "./routes/room.route"
 
 //express server
 const app = express()
@@ -41,6 +42,8 @@ app.get("/", (req,res) => {
 
 //user router
 app.use("/api/v1/user", userRouter)
+//rooms router
+app.use("/api/v1/rooms", roomRouter)
 
 server.listen(3000, () => {
     console.log(`server is running on http://localhost:3000`)

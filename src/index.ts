@@ -8,37 +8,80 @@ import { userRouter } from "./routes/user.route"
 import { roomRouter } from "./routes/room.route"
 import { roomSocket } from "./sockets/room"
 import { quizSocket } from "./sockets/quiz"
+import { jwtVerify } from "jose"
+import { corsOptions } from "./config/corOptions"
+
+//secret for the token
+const secret = new TextEncoder().encode(process.env.JWT_SECRET)
 
 //express server
 const app = express()
-app.use(cors())
+
+//for getting and sending json 
+app.use(express.json())
+
+//using cors
+app.use(cors(corsOptions))
+
+//for sending cookie
 app.use(cookieParser())
+
+//creating the server for the socket
 const server = createServer(app)
 
 
 // connectDB()
 //socket
 const io = new Server(server, {
+    //making the  socket use cors
     cors:{
         origin:"http://localhost:5173",
         methods:["POST","GET"]
     }
 })
 
+//socket middleware to handle auth
+io.use(async(socket, next) => {
+    try{
+        const token = socket.handshake.auth.token
+        if(!token){
+            return next(new Error("no token found"))
+        }
+
+        const { payload } = await jwtVerify(token, secret)
+
+        socket.data.id = payload.id
+        next()
+    }catch(error){
+        console.log(error)
+    }
+})
+
+
+//the two need connection
 io.on("connection", (socket) => {
-   roomSocket(io, socket)
+
+    //Room socket for room join, leaving and rejoin
+    roomSocket(io, socket)
+
+    //Quiz socket for quiz starting, ending and scoring 
    quizSocket(io, socket)
 })
 
+//health route
 app.get("/", (req,res) => {
     res.send("hello world")
 })
 
-//user router
+
+//user router for authentication
 app.use("/api/v1/user", userRouter)
-//rooms router
+
+//rooms router for room creation and getting all rooms
 app.use("/api/v1/rooms", roomRouter)
 
+
+//server starting point 
 server.listen(3000, () => {
     console.log(`server is running on http://localhost:3000`)
 })

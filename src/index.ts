@@ -10,9 +10,10 @@ import { roomSocket } from "./sockets/room"
 import { quizSocket } from "./sockets/quiz"
 import { jwtVerify } from "jose"
 import { corsOptions } from "./config/corOptions"
+import { config } from "./config/config"
 
 //secret for the token
-const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+const secret = new TextEncoder().encode(config.JWT_SECRET)
 
 //express server
 const app = express()

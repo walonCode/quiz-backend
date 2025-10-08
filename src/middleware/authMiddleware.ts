@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { jwtVerify } from "jose"
+import { config } from "../config/config";
 
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+const secret = new TextEncoder().encode(config.JWT_SECRET)
 
 export async function authMiddleware(req:Request, res:Response, next:NextFunction){
     try{

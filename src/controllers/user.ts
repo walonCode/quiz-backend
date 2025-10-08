@@ -2,8 +2,9 @@ import { Request, Response} from "express"
 import User from "../models/userModel"
 import bcrypt from "bcryptjs"
 import { SignJWT } from "jose"
+import { config } from "../config/config"
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+const secret = new TextEncoder().encode(config.JWT_SECRET)
 
 export async function login(req:Request, res:Response){
     try{

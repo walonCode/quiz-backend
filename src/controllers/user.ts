@@ -25,7 +25,7 @@ export async function login(req:Request, res:Response){
             })
         }
 
-        const accessToken = await new SignJWT({ id: userExist.id}).setExpirationTime('7d').setProtectedHeader({"alg":"H256"}).sign(secret)
+        const accessToken = await new SignJWT({ id: userExist._id}).setExpirationTime('7d').setProtectedHeader({"alg":"H256"}).sign(secret)
 
         res.cookie("accessToken", accessToken, {
             maxAge:60 * 60 * 60 * 24,
@@ -82,7 +82,7 @@ export async function signup(req:Request, res:Response){
 
         await user.save()
 
-        const accessToken = await new SignJWT({ id: user.id}).setExpirationTime('7d').setProtectedHeader({"alg":"H256"}).sign(secret)
+        const accessToken = await new SignJWT({ id: user._id}).setExpirationTime('7d').setProtectedHeader({"alg":"H256"}).sign(secret)
 
         res.cookie("accessToken", accessToken, {
             maxAge:60 * 60 * 60 * 24,

@@ -73,9 +73,15 @@ export async function quizSocket(io:Server, socket:Socket){
             })
             cb?.({ ok:true })
         }else {
+            const sortedPlayer = players.sort((a,b) => b.currentScore - a.currentScore)
+            const winner = sortedPlayer[0]
+
             io.to(roomId).emit("quiz-ended", players.map(p => ({ username:p.username, score:p.currentScore})))
-            await User.updateMany({ _id: { $in:room?.members}}, { currentScore:0})
-            await Quiz.findOneAndUpdate({ roomId:roomId}, { endTIme:Date.now(), })
+            await Promise.all([
+                User.updateMany({ _id: { $in:room?.members}}, { currentScore:0}),
+                Quiz.findOneAndUpdate({ roomId:roomId}, { endTIme:Date.now(),highScore:{ username:winner.username, score:winner.currentScore} }),
+                Room.findByIdAndUpdate({ _id:roomId}, { $set: {isActive:false}})
+            ])
             cb?.({ok:true})
         }
     }})

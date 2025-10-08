@@ -5,11 +5,11 @@ const quiz = new Schema({
     startTime:{ type:Date, required:true},
     endTIme: { type:Date },
     highScore: { 
-        userId: { type: mongoose.Schema.Types.ObjectId, ref:"User"},
+        userId: { type:String},
         score: { type:Number, default:0}
     }
 }, { timestamps:true })
 
 const Quiz = mongoose.model("quiz", quiz)
 
-export default Quiz;
+export default Quiz; 

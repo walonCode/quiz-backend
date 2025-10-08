@@ -6,6 +6,8 @@ import connectDB from "./config/db"
 import cookieParser from "cookie-parser"
 import { userRouter } from "./routes/user.route"
 import { roomRouter } from "./routes/room.route"
+import { roomSocket } from "./sockets/room"
+import { quizSocket } from "./sockets/quiz"
 
 //express server
 const app = express()
@@ -24,16 +26,8 @@ const io = new Server(server, {
 })
 
 io.on("connection", (socket) => {
-    console.log(`socket connected: ${socket.id}`)
-    socket.on("chat-message", (value) => {
-        socket.broadcast.emit(value)
-        io.emit(value)
-        console.log(value)
-    })
-
-    socket.on("chat:message", (data) => {
-        console.log(data)
-    })
+   roomSocket(io, socket)
+   quizSocket(io, socket)
 })
 
 app.get("/", (req,res) => {

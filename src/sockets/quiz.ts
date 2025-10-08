@@ -57,7 +57,7 @@ export async function quizSocket(io:Server, socket:Socket){
             score = 10;
         }
 
-        await User.updateOne({id:userId}, { $inc: { currentScore:score, allTimeScore:score}})
+        await User.updateOne({_id:userId}, { $inc: { currentScore:score, allTimeScore:score}})
 
         const players = await User.find({_id: {$in: room?.members}})
 
